@@ -114,8 +114,8 @@ animation: scanline 3s linear infinite;
 
 .progress-section { margin-bottom: 10px; }
 .progress-labels { display: flex; justify-content: space-between; font-family: ‘Share Tech Mono’, monospace; font-size: 11px; color: #5a7a9a; margin-bottom: 8px; }
-.progress-track { height: 20px; background: rgba(255,255,255,0.04); border: 1px solid #1a2a4a; border-radius: 2px; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, #3a7bd5, #00d4ff); transition: width 0.8s cubic-bezier(0.23,1,0.32,1); border-radius: 2px; box-shadow: 0 0 12px rgba(0,212,255,0.5); position: relative; }
+.progress-track { height: 20px; background: #0d1f3c; border: 1px solid #2a4a8a; border-radius: 2px; position: relative; overflow: visible; }
+.progress-fill { height: 20px; background-color: #00d4ff !important; background: #00d4ff !important; transition: width 0.8s ease; border-radius: 2px; display: block; position: absolute; top: 0; left: 0; }
 .progress-fill::after { content: ‘’; position: absolute; top: 0; right: 0; bottom: 0; width: 20px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3)); animation: shimmer 2s linear infinite; }
 .progress-text { text-align: center; font-family: ‘Share Tech Mono’, monospace; font-size: 12px; color: #00d4ff; margin-top: 6px; }
 
@@ -147,12 +147,12 @@ animation: scanline 3s linear infinite;
 .stat-xp span { font-size: 11px; color: #5a7a9a; font-family: ‘Share Tech Mono’, monospace; font-weight: 400; }
 .stat-name { font-size: 12px; color: #5a7a9a; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
 .stat-source { font-family: ‘Share Tech Mono’, monospace; font-size: 10px; color: #5a7a9a; margin-bottom: 10px; opacity: 0.6; }
-.stat-bar-track { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
+.stat-bar-track { height: 6px; background: #0d1f3c; border-radius: 3px; position: relative; overflow: visible; margin-bottom: 12px; }
 .stat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.23,1,0.32,1); }
-.str .stat-bar-fill { background: linear-gradient(90deg,#c0392b,#ff4c4c); box-shadow: 0 0 8px rgba(255,76,76,0.5); }
-.wis .stat-bar-fill { background: linear-gradient(90deg,#6d28d9,#a78bfa); box-shadow: 0 0 8px rgba(167,139,250,0.5); }
-.int .stat-bar-fill { background: linear-gradient(90deg,#0369a1,#38bdf8); box-shadow: 0 0 8px rgba(56,189,248,0.5); }
-.cre .stat-bar-fill { background: linear-gradient(90deg,#065f46,#34d399); box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+.str .stat-bar-fill { background-color: #ff4c4c !important; background: #ff4c4c !important; height: 6px; display: block; position: absolute; top: 0; left: 0; border-radius: 3px; }
+.wis .stat-bar-fill { background-color: #a78bfa !important; background: #a78bfa !important; height: 6px; display: block; position: absolute; top: 0; left: 0; border-radius: 3px; }
+.int .stat-bar-fill { background-color: #38bdf8 !important; background: #38bdf8 !important; height: 6px; display: block; position: absolute; top: 0; left: 0; border-radius: 3px; }
+.cre .stat-bar-fill { background-color: #34d399 !important; background: #34d399 !important; height: 6px; display: block; position: absolute; top: 0; left: 0; border-radius: 3px; }
 
 .stat-actions { display: flex; gap: 8px; align-items: center; }
 .btn-xp { flex: 1; padding: 8px 0; border: none; border-radius: 3px; font-family: ‘Rajdhani’, sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; cursor: pointer; transition: all 0.15s; text-transform: uppercase; }
