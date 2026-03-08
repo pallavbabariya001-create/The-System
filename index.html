@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SYSTEM INTERFACE — Pallav</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05080f;
+    --bg2: #080d18;
+    --panel: #0b1120;
+    --border: #1a2a4a;
+    --border-glow: #2a4a8a;
+    --blue: #3a7bd5;
+    --blue-bright: #5b9ef7;
+    --cyan: #00d4ff;
+    --gold: #f0c040;
+    --gold-dim: #a07820;
+    --str: #ff4c4c;
+    --wis: #a78bfa;
+    --int: #38bdf8;
+    --cre: #34d399;
+    --text: #c8d8f0;
+    --text-dim: #5a7a9a;
+    --text-bright: #e8f4ff;
+    --drain: #ff3333;
+    --glow-blue: 0 0 20px rgba(58,123,213,0.4);
+    --glow-cyan: 0 0 15px rgba(0,212,255,0.3);
+    --glow-gold: 0 0 20px rgba(240,192,64,0.4);
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Rajdhani’, sans-serif;
+min-height: 100vh;
+overflow-x: hidden;
+position: relative;
+}
+
+/* Animated background grid */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image:
+linear-gradient(rgba(58,123,213,0.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(58,123,213,0.04) 1px, transparent 1px);
+background-size: 40px 40px;
+animation: gridPulse 8s ease-in-out infinite;
+pointer-events: none;
+z-index: 0;
+}
+
+body::after {
+content: ‘’;
+position: fixed;
+inset: 0;
+background: radial-gradient(ellipse at 50% 0%, rgba(58,123,213,0.08) 0%, transparent 60%);
+pointer-events: none;
+z-index: 0;
+}
+
+@keyframes gridPulse {
+0%, 100% { opacity: 0.5; }
+50% { opacity: 1; }
+}
+
+.container {
+max-width: 900px;
+margin: 0 auto;
+padding: 20px 16px 60px;
+position: relative;
+z-index: 1;
+}
+
+/* HEADER */
+.header {
+text-align: center;
+padding: 30px 0 20px;
+position: relative;
+}
+
+.system-tag {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px;
+color: var(–cyan);
+letter-spacing: 4px;
+text-transform: uppercase;
+margin-bottom: 8px;
+opacity: 0.7;
+}
+
+.player-name {
+font-family: ‘Orbitron’, sans-serif;
+font-size: clamp(28px, 6vw, 48px);
+font-weight: 900;
+color: var(–text-bright);
+letter-spacing: 6px;
+text-transform: uppercase;
+text-shadow: 0 0 30px rgba(91,158,247,0.5), 0 0 60px rgba(91,158,247,0.2);
+margin-bottom: 6px;
+}
+
+.build-tag {
+font-size: 13px;
+color: var(–gold);
+letter-spacing: 2px;
+font-weight: 600;
+text-transform: uppercase;
+text-shadow: var(–glow-gold);
+}
+
+.objective {
+font-size: 12px;
+color: var(–text-dim);
+margin-top: 6px;
+letter-spacing: 1px;
+font-family: ‘Share Tech Mono’, monospace;
+}
+
+.divider {
+height: 1px;
+background: linear-gradient(90deg, transparent, var(–border-glow), transparent);
+margin: 20px 0;
+}
+
+/* LEVEL CARD */
+.level-card {
+background: var(–panel);
+border: 1px solid var(–border-glow);
+border-radius: 4px;
+padding: 24px;
+margin-bottom: 16px;
+box-shadow: var(–glow-blue), inset 0 1px 0 rgba(91,158,247,0.1);
+position: relative;
+overflow: hidden;
+}
+
+.level-card::before {
+content: ‘’;
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 2px;
+background: linear-gradient(90deg, transparent, var(–cyan), var(–blue), transparent);
+animation: scanline 3s linear infinite;
+}
+
+@keyframes scanline {
+0% { transform: translateX(-100%); }
+100% { transform: translateX(100%); }
+}
+
+.level-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 16px;
+flex-wrap: wrap;
+gap: 10px;
+}
+
+.level-info {
+display: flex;
+align-items: center;
+gap: 16px;
+}
+
+.level-badge {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 36px;
+font-weight: 900;
+color: var(–cyan);
+text-shadow: var(–glow-cyan);
+line-height: 1;
+}
+
+.level-label {
+font-size: 11px;
+color: var(–text-dim);
+letter-spacing: 3px;
+text-transform: uppercase;
+font-family: ‘Share Tech Mono’, monospace;
+}
+
+.total-exp-display {
+text-align: right;
+}
+
+.total-exp-num {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 28px;
+font-weight: 700;
+color: var(–gold);
+text-shadow: var(–glow-gold);
+}
+
+.total-exp-label {
+font-size: 11px;
+color: var(–text-dim);
+letter-spacing: 2px;
+text-transform: uppercase;
+font-family: ‘Share Tech Mono’, monospace;
+}
+
+/* PROGRESS BAR */
+.progress-section {
+margin-bottom: 10px;
+}
+
+.progress-labels {
+display: flex;
+justify-content: space-between;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px;
+color: var(–text-dim);
+margin-bottom: 8px;
+}
+
+.progress-track {
+height: 20px;
+background: rgba(255,255,255,0.04);
+border: 1px solid var(–border);
+border-radius: 2px;
+overflow: hidden;
+position: relative;
+}
+
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–blue), var(–cyan));
+transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+position: relative;
+border-radius: 2px;
+box-shadow: 0 0 12px rgba(0,212,255,0.5);
+}
+
+.progress-fill::after {
+content: ‘’;
+position: absolute;
+top: 0; right: 0; bottom: 0;
+width: 20px;
+background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3));
+animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+0% { opacity: 0.5; }
+50% { opacity: 1; }
+100% { opacity: 0.5; }
+}
+
+.progress-text {
+text-align: center;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 12px;
+color: var(–cyan);
+margin-top: 6px;
+}
+
+/* LEVEL INFO STRIP */
+.level-info-strip {
+background: rgba(0,212,255,0.04);
+border: 1px solid rgba(0,212,255,0.15);
+border-radius: 3px;
+padding: 10px 16px;
+display: flex;
+flex-wrap: wrap;
+gap: 16px;
+margin-top: 14px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px;
+}
+
+.strip-item {
+display: flex;
+flex-direction: column;
+gap: 2px;
+}
+
+.strip-label { color: var(–text-dim); letter-spacing: 1px; }
+.strip-value { color: var(–cyan); font-weight: 700; }
+.strip-value.drain { color: var(–drain); }
+.strip-value.perk { color: var(–gold); }
+
+/* STATS GRID */
+.stats-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 12px;
+margin-bottom: 16px;
+}
+
+@media (max-width: 500px) {
+.stats-grid { grid-template-columns: 1fr; }
+}
+
+.stat-card {
+background: var(–panel);
+border: 1px solid var(–border);
+border-radius: 4px;
+padding: 18px;
+position: relative;
+overflow: hidden;
+transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+border-color: var(–border-glow);
+box-shadow: var(–glow-blue);
+}
+
+.stat-card.str { border-left: 3px solid var(–str); }
+.stat-card.wis { border-left: 3px solid var(–wis); }
+.stat-card.int { border-left: 3px solid var(–int); }
+.stat-card.cre { border-left: 3px solid var(–cre); }
+
+.stat-header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+margin-bottom: 12px;
+}
+
+.stat-tag {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 12px;
+font-weight: 700;
+padding: 3px 8px;
+border-radius: 2px;
+letter-spacing: 1px;
+}
+
+.str .stat-tag { background: rgba(255,76,76,0.15); color: var(–str); border: 1px solid rgba(255,76,76,0.3); }
+.wis .stat-tag { background: rgba(167,139,250,0.15); color: var(–wis); border: 1px solid rgba(167,139,250,0.3); }
+.int .stat-tag { background: rgba(56,189,248,0.15); color: var(–int); border: 1px solid rgba(56,189,248,0.3); }
+.cre .stat-tag { background: rgba(52,211,153,0.15); color: var(–cre); border: 1px solid rgba(52,211,153,0.3); }
+
+.stat-xp {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 22px;
+font-weight: 700;
+color: var(–text-bright);
+}
+
+.stat-xp span {
+font-size: 11px;
+color: var(–text-dim);
+font-family: ‘Share Tech Mono’, monospace;
+font-weight: 400;
+}
+
+.stat-name {
+font-size: 12px;
+color: var(–text-dim);
+letter-spacing: 1px;
+margin-bottom: 10px;
+text-transform: uppercase;
+}
+
+.stat-source {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 10px;
+color: var(–text-dim);
+margin-bottom: 10px;
+opacity: 0.6;
+}
+
+.stat-bar-track {
+height: 6px;
+background: rgba(255,255,255,0.05);
+border-radius: 3px;
+overflow: hidden;
+margin-bottom: 12px;
+}
+
+.stat-bar-fill {
+height: 100%;
+border-radius: 3px;
+transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.str .stat-bar-fill { background: linear-gradient(90deg, #c0392b, var(–str)); box-shadow: 0 0 8px rgba(255,76,76,0.5); }
+.wis .stat-bar-fill { background: linear-gradient(90deg, #6d28d9, var(–wis)); box-shadow: 0 0 8px rgba(167,139,250,0.5); }
+.int .stat-bar-fill { background: linear-gradient(90deg, #0369a1, var(–int)); box-shadow: 0 0 8px rgba(56,189,248,0.5); }
+.cre .stat-bar-fill { background: linear-gradient(90deg, #065f46, var(–cre)); box-shadow: 0 0 8px rgba(52,211,153,0.5); }
+
+.stat-actions {
+display: flex;
+gap: 8px;
+align-items: center;
+}
+
+.btn-xp {
+flex: 1;
+padding: 8px 0;
+border: none;
+border-radius: 3px;
+font-family: ‘Rajdhani’, sans-serif;
+font-weight: 700;
+font-size: 13px;
+letter-spacing: 1px;
+cursor: pointer;
+transition: all 0.15s;
+text-transform: uppercase;
+}
+
+.btn-add {
+background: rgba(58,123,213,0.15);
+border: 1px solid rgba(58,123,213,0.4);
+color: var(–blue-bright);
+}
+
+.btn-add:hover {
+background: rgba(58,123,213,0.3);
+box-shadow: 0 0 12px rgba(58,123,213,0.3);
+transform: translateY(-1px);
+}
+
+.btn-add:active { transform: scale(0.97); }
+
+.btn-drain {
+background: rgba(255,51,51,0.1);
+border: 1px solid rgba(255,51,51,0.3);
+color: var(–drain);
+flex: 0 0 auto;
+padding: 8px 12px;
+font-size: 18px;
+}
+
+.btn-drain:hover {
+background: rgba(255,51,51,0.2);
+}
+
+/* QUEST LOG */
+.section-title {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 13px;
+font-weight: 700;
+letter-spacing: 3px;
+text-transform: uppercase;
+color: var(–text-dim);
+margin-bottom: 12px;
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.section-title::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: linear-gradient(90deg, var(–border), transparent);
+}
+
+.quest-list {
+display: flex;
+flex-direction: column;
+gap: 8px;
+margin-bottom: 16px;
+}
+
+.quest-item {
+background: var(–panel);
+border: 1px solid var(–border);
+border-radius: 3px;
+padding: 14px 16px;
+display: flex;
+align-items: center;
+gap: 14px;
+cursor: pointer;
+transition: all 0.2s;
+position: relative;
+overflow: hidden;
+}
+
+.quest-item:hover {
+border-color: var(–border-glow);
+}
+
+.quest-item.completed {
+border-color: rgba(52,211,153,0.3);
+background: rgba(52,211,153,0.04);
+}
+
+.quest-item.completed::before {
+content: ‘’;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+width: 3px;
+background: var(–cre);
+}
+
+.quest-check {
+width: 22px;
+height: 22px;
+border: 2px solid var(–border-glow);
+border-radius: 3px;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-shrink: 0;
+transition: all 0.2s;
+font-size: 13px;
+}
+
+.quest-item.completed .quest-check {
+background: var(–cre);
+border-color: var(–cre);
+box-shadow: 0 0 10px rgba(52,211,153,0.4);
+}
+
+.quest-body { flex: 1; }
+
+.quest-name {
+font-size: 15px;
+font-weight: 600;
+color: var(–text-bright);
+margin-bottom: 3px;
+}
+
+.quest-item.completed .quest-name {
+color: var(–text-dim);
+text-decoration: line-through;
+}
+
+.quest-req {
+font-size: 12px;
+color: var(–text-dim);
+font-family: ‘Share Tech Mono’, monospace;
+}
+
+.quest-reward {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 12px;
+font-weight: 700;
+white-space: nowrap;
+}
+
+.quest-reward.str-col { color: var(–str); }
+.quest-reward.wis-col { color: var(–wis); }
+.quest-reward.int-col { color: var(–int); }
+.quest-reward.cre-col { color: var(–cre); }
+
+/* REWARD SYSTEM */
+.reward-panel {
+background: var(–panel);
+border: 1px solid var(–border);
+border-radius: 4px;
+padding: 20px;
+margin-bottom: 16px;
+}
+
+.reward-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+gap: 10px;
+}
+
+.reward-item {
+background: rgba(255,255,255,0.03);
+border: 1px solid var(–border);
+border-radius: 3px;
+padding: 12px;
+text-align: center;
+}
+
+.reward-icon { font-size: 20px; margin-bottom: 6px; }
+
+.reward-name {
+font-size: 13px;
+font-weight: 600;
+color: var(–text);
+margin-bottom: 4px;
+}
+
+.reward-xp {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px;
+color: var(–gold);
+}
+
+.reward-leisure {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px;
+color: var(–cyan);
+margin-top: 4px;
+}
+
+/* LEVEL UP OVERLAY */
+.overlay {
+display: none;
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.85);
+z-index: 100;
+align-items: center;
+justify-content: center;
+flex-direction: column;
+}
+
+.overlay.active { display: flex; }
+
+.levelup-box {
+background: var(–panel);
+border: 2px solid var(–cyan);
+border-radius: 6px;
+padding: 40px 50px;
+text-align: center;
+box-shadow: 0 0 60px rgba(0,212,255,0.3), 0 0 120px rgba(0,212,255,0.1);
+animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+max-width: 420px;
+width: 90%;
+}
+
+@keyframes popIn {
+0% { transform: scale(0.6); opacity: 0; }
+100% { transform: scale(1); opacity: 1; }
+}
+
+.levelup-label {
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 12px;
+color: var(–cyan);
+letter-spacing: 4px;
+margin-bottom: 10px;
+}
+
+.levelup-title {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 42px;
+font-weight: 900;
+color: var(–gold);
+text-shadow: var(–glow-gold);
+margin-bottom: 10px;
+animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+from { text-shadow: 0 0 20px rgba(240,192,64,0.4); }
+to { text-shadow: 0 0 50px rgba(240,192,64,0.8), 0 0 80px rgba(240,192,64,0.3); }
+}
+
+.levelup-new {
+font-family: ‘Orbitron’, sans-serif;
+font-size: 20px;
+color: var(–cyan);
+margin-bottom: 20px;
+}
+
+.levelup-perks {
+font-size: 14px;
+color: var(–text);
+margin-bottom: 24px;
+line-height: 1.7;
+text-align: left;
+background: rgba(0,212,255,0.05);
+border: 1px solid rgba(0,212,255,0.15);
+border-radius: 3px;
+padding: 14px;
+}
+
+.perk-line { color: var(–gold); font-weight: 600; }
+
+.btn-close {
+background: var(–blue);
+border: none;
+padding: 12px 40px;
+border-radius: 3px;
+color: white;
+font-family: ‘Orbitron’, sans-serif;
+font-size: 13px;
+font-weight: 700;
+letter-spacing: 2px;
+cursor: pointer;
+transition: all 0.2s;
+text-transform: uppercase;
+}
+
+.btn-close:hover {
+background: var(–blue-bright);
+box-shadow: 0 0 20px rgba(91,158,247,0.4);
+}
+
+/* XP POPUP */
+.xp-popup {
+position: fixed;
+font-family: ‘Orbitron’, sans-serif;
+font-size: 18px;
+font-weight: 900;
+pointer-events: none;
+z-index: 200;
+animation: floatUp 1.5s ease-out forwards;
+}
+
+@keyframes floatUp {
+0% { transform: translateY(0) scale(0.8); opacity: 1; }
+100% { transform: translateY(-80px) scale(1.1); opacity: 0; }
+}
+
+/* RESET */
+.reset-row {
+text-align: center;
+margin-top: 30px;
+}
+
+.btn-reset {
+background: none;
+border: 1px solid rgba(255,51,51,0.2);
+color: rgba(255,51,51,0.4);
+padding: 8px 24px;
+border-radius: 3px;
+font-family: ‘Share Tech Mono’, monospace;
+font-size: 11px;
+cursor: pointer;
+letter-spacing: 2px;
+transition: all 0.2s;
+text-transform: uppercase;
+}
+
+.btn-reset:hover {
+color: var(–drain);
+border-color: var(–drain);
+}
+
+/* Scan flash */
+.flash {
+position: fixed;
+inset: 0;
+background: rgba(0,212,255,0.08);
+pointer-events: none;
+z-index: 50;
+animation: flashOut 0.3s ease-out forwards;
+}
+
+@keyframes flashOut {
+0% { opacity: 1; }
+100% { opacity: 0; }
+}
+
+.particles {
+position: fixed;
+inset: 0;
+pointer-events: none;
+z-index: 150;
+overflow: hidden;
+}
+
+.particle {
+position: absolute;
+width: 4px;
+height: 4px;
+border-radius: 50%;
+animation: particleFly 1.5s ease-out forwards;
+}
+
+@keyframes particleFly {
+0% { transform: translate(0, 0) scale(1); opacity: 1; }
+100% { transform: translate(var(–tx), var(–ty)) scale(0); opacity: 0; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="system-tag">◈ SYSTEM INTERFACE ◈</div>
+    <div class="player-name">PALLAV</div>
+    <div class="build-tag">The Transformation Arc — v1.0</div>
+    <div class="objective">Evolve from "Chubby Origin" → "The Architect"</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- LEVEL CARD -->
+
+  <div class="level-card">
+    <div class="level-row">
+      <div class="level-info">
+        <div>
+          <div class="level-label">Current Level</div>
+          <div class="level-badge" id="levelDisplay">0</div>
+        </div>
+        <div style="border-left:1px solid var(--border); padding-left:16px;">
+          <div class="level-label">Daily EXP Today</div>
+          <div style="font-family:'Orbitron',sans-serif;font-size:22px;font-weight:700;color:var(--blue-bright)" id="dailyExpDisplay">0</div>
+        </div>
+      </div>
+      <div class="total-exp-display">
+        <div class="total-exp-label">Total EXP</div>
+        <div class="total-exp-num" id="totalExpDisplay">0</div>
+      </div>
+    </div>
+
+```
+<div class="progress-section">
+  <div class="progress-labels">
+    <span id="levelFromLabel">Level 0</span>
+    <span id="progressLabel">0 / 100 XP</span>
+    <span id="levelToLabel">Level 1</span>
+  </div>
+  <div class="progress-track">
+    <div class="progress-fill" id="mainProgressBar" style="width:0%"></div>
+  </div>
+  <div class="progress-text" id="progressPercent">0%</div>
+</div>
+
+<div class="level-info-strip" id="levelInfoStrip">
+  <div class="strip-item">
+    <div class="strip-label">SESSION EXP</div>
+    <div class="strip-value" id="stripSession">+5 / session</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-label">DRAIN</div>
+    <div class="strip-value drain" id="stripDrain">-5 / missed</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-label">LEISURE TIME</div>
+    <div class="strip-value" id="stripLeisure">30 min (after 10 EXP)</div>
+  </div>
+  <div class="strip-item">
+    <div class="strip-label">PERK</div>
+    <div class="strip-value perk" id="stripPerk">None</div>
+  </div>
+</div>
+```
+
+  </div>
+
+  <!-- STATS -->
+
+  <div class="section-title">◈ Active Pillars — Core Stats</div>
+  <div class="stats-grid">
+    <!-- STR -->
+    <div class="stat-card str">
+      <div class="stat-header">
+        <div>
+          <div class="stat-tag">STR</div>
+          <div class="stat-name" style="margin-top:6px">Physical Prowess</div>
+          <div class="stat-source">SOURCE: Gym</div>
+        </div>
+        <div class="stat-xp"><span id="strXP">0</span><span> XP</span></div>
+      </div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" id="strBar" style="width:0%"></div></div>
+      <div class="stat-actions">
+        <button class="btn-xp btn-add" onclick="addStatXP('str')">+ Quest Complete</button>
+        <button class="btn-xp btn-drain" onclick="drainStat('str')" title="Missed session">⚠</button>
+      </div>
+    </div>
+    <!-- WIS -->
+    <div class="stat-card wis">
+      <div class="stat-header">
+        <div>
+          <div class="stat-tag">WIS</div>
+          <div class="stat-name" style="margin-top:6px">Ancient Archive</div>
+          <div class="stat-source">SOURCE: Reading</div>
+        </div>
+        <div class="stat-xp"><span id="wisXP">0</span><span> XP</span></div>
+      </div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" id="wisBar" style="width:0%"></div></div>
+      <div class="stat-actions">
+        <button class="btn-xp btn-add" onclick="addStatXP('wis')">+ Quest Complete</button>
+        <button class="btn-xp btn-drain" onclick="drainStat('wis')" title="Missed session">⚠</button>
+      </div>
+    </div>
+    <!-- INT -->
+    <div class="stat-card int">
+      <div class="stat-header">
+        <div>
+          <div class="stat-tag">INT</div>
+          <div class="stat-name" style="margin-top:6px">Cognitive Depth</div>
+          <div class="stat-source">SOURCE: Study / Skill</div>
+        </div>
+        <div class="stat-xp"><span id="intXP">0</span><span> XP</span></div>
+      </div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" id="intBar" style="width:0%"></div></div>
+      <div class="stat-actions">
+        <button class="btn-xp btn-add" onclick="addStatXP('int')">+ Quest Complete</button>
+        <button class="btn-xp btn-drain" onclick="drainStat('int')" title="Missed session">⚠</button>
+      </div>
+    </div>
+    <!-- CRE -->
+    <div class="stat-card cre">
+      <div class="stat-header">
+        <div>
+          <div class="stat-tag">CRE</div>
+          <div class="stat-name" style="margin-top:6px">World-Binder</div>
+          <div class="stat-source">SOURCE: World-Building / Hobbies</div>
+        </div>
+        <div class="stat-xp"><span id="creXP">0</span><span> XP</span></div>
+      </div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" id="creBar" style="width:0%"></div></div>
+      <div class="stat-actions">
+        <button class="btn-xp btn-add" onclick="addStatXP('cre')">+ Quest Complete</button>
+        <button class="btn-xp btn-drain" onclick="drainStat('cre')" title="Missed session">⚠</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAILY QUESTS -->
+
+  <div class="section-title">⚔ Daily Quest Log</div>
+  <div class="quest-list">
+    <div class="quest-item" id="quest-str" onclick="toggleQuest('str')">
+      <div class="quest-check" id="check-str"></div>
+      <div class="quest-body">
+        <div class="quest-name">The Iron Path</div>
+        <div class="quest-req">45+ mins of focused physical training</div>
+      </div>
+      <div class="quest-reward str-col">+5 STR XP</div>
+    </div>
+    <div class="quest-item" id="quest-int" onclick="toggleQuest('int')">
+      <div class="quest-check" id="check-int"></div>
+      <div class="quest-body">
+        <div class="quest-name">The Scholar's Grind</div>
+        <div class="quest-req">1 hour of deep, distraction-free study</div>
+      </div>
+      <div class="quest-reward int-col">+5 INT XP</div>
+    </div>
+    <div class="quest-item" id="quest-wis" onclick="toggleQuest('wis')">
+      <div class="quest-check" id="check-wis"></div>
+      <div class="quest-body">
+        <div class="quest-name">The Great Library</div>
+        <div class="quest-req">Read 20+ pages of a novel or non-fiction book</div>
+      </div>
+      <div class="quest-reward wis-col">+5 WIS XP</div>
+    </div>
+    <div class="quest-item" id="quest-cre" onclick="toggleQuest('cre')">
+      <div class="quest-check" id="check-cre"></div>
+      <div class="quest-body">
+        <div class="quest-name">Genesis Protocol</div>
+        <div class="quest-req">1 new lore entry / 30+ mins of a new hobby (drawing, language, etc.)</div>
+      </div>
+      <div class="quest-reward cre-col">+5 CRE XP</div>
+    </div>
+  </div>
+
+  <!-- REWARD SYSTEM -->
+
+  <div class="section-title">🎮 Leisure Reward System</div>
+  <div class="reward-panel">
+    <div class="reward-grid">
+      <div class="reward-item">
+        <div class="reward-icon">🎮</div>
+        <div class="reward-name">Gaming</div>
+        <div class="reward-xp" id="rew-gaming">10 EXP / hr</div>
+      </div>
+      <div class="reward-item">
+        <div class="reward-icon">📺</div>
+        <div class="reward-name">YouTube / Anime</div>
+        <div class="reward-xp" id="rew-yt">12 EXP / ep</div>
+      </div>
+      <div class="reward-item">
+        <div class="reward-icon">🎬</div>
+        <div class="reward-name">Movie</div>
+        <div class="reward-xp" id="rew-movie">20 EXP</div>
+      </div>
+      <div class="reward-item">
+        <div class="reward-icon">📖</div>
+        <div class="reward-name">Manga / Manhwa</div>
+        <div class="reward-xp" id="rew-manga">2 EXP / session</div>
+      </div>
+      <div class="reward-item">
+        <div class="reward-icon">⏱️</div>
+        <div class="reward-name">Free Time</div>
+        <div class="reward-xp" id="rew-leisure">30 min / day</div>
+        <div class="reward-leisure" id="rew-leisure-req">after 10 EXP</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="reset-row">
+    <button class="btn-reset" onclick="confirmReset()">⚠ RESET ALL DATA</button>
+  </div>
+</div>
+
+<!-- LEVEL UP OVERLAY -->
+
+<div class="overlay" id="levelUpOverlay">
+  <div class="levelup-box">
+    <div class="levelup-label">◈ SYSTEM NOTIFICATION ◈</div>
+    <div class="levelup-title">LEVEL UP!</div>
+    <div class="levelup-new">→ Level <span id="newLevelNum">1</span></div>
+    <div class="levelup-perks" id="levelupPerks"></div>
+    <button class="btn-close" onclick="closeLevelUp()">ACKNOWLEDGE</button>
+  </div>
+</div>
+
+<div class="particles" id="particlesContainer"></div>
+
+<script>
+// ─── LEVEL CONFIG ────────────────────────────────────────
+const LEVELS = [
+  { level: 0, minExp: 0,    maxExp: 99,   sessionXP: 5,  drain: 5,  leisure: 30, leisureReq: 10, gaming: 10, yt: 12, movie: 20, manga: 2, perk: 'None' },
+  { level: 1, minExp: 100,  maxExp: 299,  sessionXP: 6,  drain: 6,  leisure: 30, leisureReq: 10, gaming: 8,  yt: 10, movie: 18, manga: 2, perk: 'None' },
+  { level: 2, minExp: 300,  maxExp: 749,  sessionXP: 8,  drain: 10, leisure: 40, leisureReq: 20, gaming: 8,  yt: 10, movie: 18, manga: 3, perk: 'None' },
+  { level: 3, minExp: 750,  maxExp: 999,  sessionXP: 9,  drain: 12, leisure: 45, leisureReq: 25, gaming: 7,  yt: 9,  movie: 17, manga: 3, perk: 'One Day Freedom Pass (150 EXP, 1×/week)' },
+  { level: 4, minExp: 1000, maxExp: 1499, sessionXP: 12, drain: 15, leisure: 45, leisureReq: 35, gaming: 15, yt: 20, movie: 20, manga: 5, perk: 'Half-Day Freedom Pass (80 EXP, 2×/week)' },
+  { level: 5, minExp: 1500, maxExp: 1999, sessionXP: 15, drain: 20, leisure: 45, leisureReq: 45, gaming: 15, yt: 20, movie: 25, manga: 7, perk: 'Half-Day Freedom Pass (80 EXP, 3×/week)' },
+];
+
+const QUEST_STAT = { str: 'str', wis: 'wis', int: 'int', cre: 'cre' };
+
+// ─── STATE ───────────────────────────────────────────────
+let state = loadState();
+
+function defaultState() {
+  return {
+    totalExp: 0,
+    dailyExp: 0,
+    stats: { str: 0, wis: 0, int: 0, cre: 0 },
+    questsDone: { str: false, wis: false, int: false, cre: false },
+    lastDay: new Date().toDateString()
+  };
+}
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('pallav_system');
+    if (s) {
+      const parsed = JSON.parse(s);
+      // Reset daily quests if new day
+      if (parsed.lastDay !== new Date().toDateString()) {
+        parsed.questsDone = { str: false, wis: false, int: false, cre: false };
+        parsed.dailyExp = 0;
+        parsed.lastDay = new Date().toDateString();
+      }
+      return parsed;
+    }
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem('pallav_system', JSON.stringify(state));
+}
+
+// ─── LEVEL CALC ───────────────────────────────────────────
+function getCurrentLevel() {
+  let lvl = LEVELS[0];
+  for (let i = LEVELS.length - 1; i >= 0; i--) {
+    if (state.totalExp >= LEVELS[i].minExp) { lvl = LEVELS[i]; break; }
+  }
+  return lvl;
+}
+
+function getNextLevel() {
+  const cur = getCurrentLevel();
+  const idx = LEVELS.findIndex(l => l.level === cur.level);
+  return LEVELS[idx + 1] || null;
+}
+
+// ─── UI UPDATE ────────────────────────────────────────────
+function updateUI() {
+  const cur = getCurrentLevel();
+  const next = getNextLevel();
+
+  // Level & EXP
+  document.getElementById('levelDisplay').textContent = cur.level;
+  document.getElementById('totalExpDisplay').textContent = state.totalExp;
+  document.getElementById('dailyExpDisplay').textContent = state.dailyExp;
+
+  // Progress bar
+  const rangeMin = cur.minExp;
+  const rangeMax = next ? next.minExp : cur.maxExp + 1;
+  const pct = Math.min(100, Math.max(0, ((state.totalExp - rangeMin) / (rangeMax - rangeMin)) * 100));
+
+  document.getElementById('mainProgressBar').style.width = pct + '%';
+  document.getElementById('levelFromLabel').textContent = 'Level ' + cur.level;
+  document.getElementById('levelToLabel').textContent = next ? 'Level ' + next.level : 'MAX';
+  document.getElementById('progressLabel').textContent = (state.totalExp - rangeMin) + ' / ' + (rangeMax - rangeMin) + ' XP';
+  document.getElementById('progressPercent').textContent = Math.floor(pct) + '%';
+
+  // Strip
+  document.getElementById('stripSession').textContent = '+' + cur.sessionXP + ' / session';
+  document.getElementById('stripDrain').textContent = '-' + cur.drain + ' / missed';
+  document.getElementById('stripLeisure').textContent = cur.leisure + ' min (after ' + cur.leisureReq + ' EXP)';
+  document.getElementById('stripPerk').textContent = cur.perk;
+
+  // Reward system
+  document.getElementById('rew-gaming').textContent = cur.gaming + ' EXP / hr';
+  document.getElementById('rew-yt').textContent = cur.yt + ' EXP / ep';
+  document.getElementById('rew-movie').textContent = cur.movie + ' EXP';
+  document.getElementById('rew-manga').textContent = cur.manga + ' EXP / session';
+  document.getElementById('rew-leisure').textContent = cur.leisure + ' min / day';
+  document.getElementById('rew-leisure-req').textContent = 'after ' + cur.leisureReq + ' EXP';
+
+  // Stats
+  ['str','wis','int','cre'].forEach(s => {
+    document.getElementById(s + 'XP').textContent = state.stats[s];
+    const maxStatXP = Math.max(1, state.totalExp || 1);
+    const pctStat = Math.min(100, (state.stats[s] / Math.max(state.stats[s], 100)) * 100);
+    document.getElementById(s + 'Bar').style.width = pctStat + '%';
+  });
+
+  // Quests
+  ['str','wis','int','cre'].forEach(s => {
+    const item = document.getElementById('quest-' + s);
+    const check = document.getElementById('check-' + s);
+    if (state.questsDone[s]) {
+      item.classList.add('completed');
+      check.textContent = '✓';
+    } else {
+      item.classList.remove('completed');
+      check.textContent = '';
+    }
+  });
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────
+function addStatXP(stat) {
+  const cur = getCurrentLevel();
+  const gain = cur.sessionXP;
+  state.stats[stat] += gain;
+  state.totalExp += gain;
+  state.dailyExp += gain;
+  saveState();
+  showXPPopup('+' + gain + ' ' + stat.toUpperCase(), event);
+  spawnParticles(event);
+  checkLevelUp(cur.level);
+  updateUI();
+}
+
+function drainStat(stat) {
+  const cur = getCurrentLevel();
+  const loss = cur.drain;
+  state.stats[stat] = Math.max(0, state.stats[stat] - loss);
+  state.totalExp = Math.max(cur.minExp, state.totalExp - loss);
+  state.dailyExp = Math.max(0, state.dailyExp - loss);
+  saveState();
+  showXPPopup('-' + loss + ' ' + stat.toUpperCase() + ' ⚠', event, true);
+  updateUI();
+}
+
+function toggleQuest(stat) {
+  if (state.questsDone[stat]) return; // can't untoggle
+  state.questsDone[stat] = true;
+  const cur = getCurrentLevel();
+  const gain = 5; // base quest reward
+  state.stats[stat] += gain;
+  state.totalExp += gain;
+  state.dailyExp += gain;
+  saveState();
+  showXPPopup('+5 ' + stat.toUpperCase() + ' XP', null, false, true);
+  checkLevelUp(cur.level);
+  updateUI();
+}
+
+let prevLevel = getCurrentLevel().level;
+function checkLevelUp(prevLvl) {
+  const newLvl = getCurrentLevel().level;
+  if (newLvl > prevLvl) {
+    setTimeout(() => showLevelUp(newLvl), 400);
+  }
+  prevLevel = newLvl;
+}
+
+function showLevelUp(lvl) {
+  const cur = LEVELS.find(l => l.level === lvl) || LEVELS[LEVELS.length - 1];
+  document.getElementById('newLevelNum').textContent = lvl;
+  const perksEl = document.getElementById('levelupPerks');
+
+  perksEl.innerHTML = `
+    <div style="margin-bottom:8px;color:var(--text-dim);font-size:12px;font-family:'Share Tech Mono',monospace;">NEW LEVEL STATS</div>
+    <div>⚔ Session EXP: <span class="perk-line">+${cur.sessionXP} per session</span></div>
+    <div>🎮 Gaming: <span class="perk-line">${cur.gaming} EXP/hr</span></div>
+    <div>📺 Anime/YouTube: <span class="perk-line">${cur.yt} EXP/ep</span></div>
+    <div>⏱ Leisure: <span class="perk-line">${cur.leisure} min (after ${cur.leisureReq} EXP)</span></div>
+    <div>⚡ Drain: <span style="color:var(--drain)">-${cur.drain} per missed session</span></div>
+    ${cur.perk !== 'None' ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">🔓 Perk Unlocked: <span class="perk-line">${cur.perk}</span></div>` : ''}
+  `;
+
+  document.getElementById('levelUpOverlay').classList.add('active');
+  spawnParticlesCenter();
+}
+
+function closeLevelUp() {
+  document.getElementById('levelUpOverlay').classList.remove('active');
+}
+
+function showXPPopup(text, ev, isDrain = false, centered = false) {
+  const el = document.createElement('div');
+  el.className = 'xp-popup';
+  el.textContent = text;
+  el.style.color = isDrain ? 'var(--drain)' : 'var(--cyan)';
+
+  if (centered || !ev) {
+    el.style.left = '50%';
+    el.style.top = '40%';
+    el.style.transform = 'translateX(-50%)';
+  } else {
+    el.style.left = (ev.clientX - 30) + 'px';
+    el.style.top = (ev.clientY - 20) + 'px';
+  }
+
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1500);
+}
+
+function spawnParticles(ev) {
+  if (!ev) return;
+  const container = document.getElementById('particlesContainer');
+  for (let i = 0; i < 10; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = (Math.random() * 360) * (Math.PI / 180);
+    const dist = 50 + Math.random() * 80;
+    p.style.left = ev.clientX + 'px';
+    p.style.top = ev.clientY + 'px';
+    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
+    p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
+    p.style.background = ['var(--cyan)','var(--blue-bright)','var(--gold)'][Math.floor(Math.random()*3)];
+    p.style.animationDelay = (Math.random() * 0.2) + 's';
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 1800);
+  }
+}
+
+function spawnParticlesCenter() {
+  const container = document.getElementById('particlesContainer');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.width = p.style.height = (4 + Math.random() * 6) + 'px';
+    const angle = (Math.random() * 360) * (Math.PI / 180);
+    const dist = 100 + Math.random() * 200;
+    p.style.left = '50vw';
+    p.style.top = '50vh';
+    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
+    p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
+    p.style.background = ['var(--cyan)','var(--gold)','var(--blue-bright)','var(--cre)'][Math.floor(Math.random()*4)];
+    p.style.animationDelay = (Math.random() * 0.3) + 's';
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+function confirmReset() {
+  if (confirm('Reset ALL progress? This cannot be undone.')) {
+    state = defaultState();
+    saveState();
+    updateUI();
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────
+updateUI();
+</script>
+
+</body>
+</html>
