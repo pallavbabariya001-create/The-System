@@ -714,6 +714,28 @@ text-align: center;
 margin-top: 30px;
 }
 
+.btn-spend {
+background: rgba(240,192,64,0.1);
+border: 1px solid rgba(240,192,64,0.3);
+color: var(–gold);
+padding: 6px 12px;
+border-radius: 3px;
+font-family: ‘Rajdhani’, sans-serif;
+font-weight: 700;
+font-size: 12px;
+letter-spacing: 1px;
+cursor: pointer;
+transition: all 0.15s;
+text-transform: uppercase;
+}
+
+.btn-spend:hover {
+background: rgba(240,192,64,0.25);
+box-shadow: 0 0 10px rgba(240,192,64,0.2);
+}
+
+.btn-spend:active { transform: scale(0.97); }
+
 .btn-reset {
 background: none;
 border: 1px solid rgba(255,51,51,0.2);
@@ -948,34 +970,62 @@ animation: particleFly 1.5s ease-out forwards;
 
   <!-- REWARD SYSTEM -->
 
-  <div class="section-title">🎮 Leisure Reward System</div>
+  <div class="section-title">🎮 Leisure — Spend EXP</div>
   <div class="reward-panel">
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-dim);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+      ◈ EXP is currency. Spending deducts from your total and can drop your level.
+      <span style="color:var(--cyan);display:block;margin-top:4px;">FREE DAILY: <span id="rew-leisure">30</span> min after <span id="rew-leisure-req">10</span> EXP earned today.</span>
+    </div>
     <div class="reward-grid">
       <div class="reward-item">
         <div class="reward-icon">🎮</div>
         <div class="reward-name">Gaming</div>
         <div class="reward-xp" id="rew-gaming">10 EXP / hr</div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          <button class="btn-spend" onclick="spendEXP('gaming',1)">1 hr</button>
+          <button class="btn-spend" onclick="spendEXP('gaming',2)">2 hr</button>
+        </div>
       </div>
       <div class="reward-item">
         <div class="reward-icon">📺</div>
         <div class="reward-name">YouTube / Anime</div>
         <div class="reward-xp" id="rew-yt">12 EXP / ep</div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;">
+          <button class="btn-spend" onclick="spendEXP('yt',1)">1 ep</button>
+          <button class="btn-spend" onclick="spendEXP('yt',2)">2 ep</button>
+          <button class="btn-spend" onclick="spendEXP('yt',3)">3 ep</button>
+        </div>
       </div>
       <div class="reward-item">
         <div class="reward-icon">🎬</div>
         <div class="reward-name">Movie</div>
         <div class="reward-xp" id="rew-movie">20 EXP</div>
+        <div style="margin-top:10px;">
+          <button class="btn-spend" onclick="spendEXP('movie',1)" style="width:100%">Watch</button>
+        </div>
       </div>
       <div class="reward-item">
         <div class="reward-icon">📖</div>
         <div class="reward-name">Manga / Manhwa</div>
         <div class="reward-xp" id="rew-manga">2 EXP / session</div>
+        <div style="margin-top:10px;">
+          <button class="btn-spend" onclick="spendEXP('manga',1)" style="width:100%">Session</button>
+        </div>
       </div>
-      <div class="reward-item">
-        <div class="reward-icon">⏱️</div>
-        <div class="reward-name">Free Time</div>
-        <div class="reward-xp" id="rew-leisure">30 min / day</div>
-        <div class="reward-leisure" id="rew-leisure-req">after 10 EXP</div>
+    </div>
+  </div>
+
+  <!-- SPEND CONFIRM OVERLAY -->
+
+  <div class="overlay" id="spendOverlay">
+    <div class="levelup-box" style="border-color:var(--gold);box-shadow:0 0 60px rgba(240,192,64,0.2);">
+      <div class="levelup-label" style="color:var(--gold)">◈ SPEND EXP ◈</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:32px;font-weight:900;color:var(--gold);margin:10px 0;" id="spendAmount"></div>
+      <div style="font-size:15px;color:var(--text);margin-bottom:8px;" id="spendDesc"></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--drain);margin-bottom:24px;" id="spendWarning"></div>
+      <div style="display:flex;gap:12px;justify-content:center;">
+        <button class="btn-close" style="background:var(--gold);color:#000;" onclick="confirmSpend()">CONFIRM</button>
+        <button class="btn-close" style="background:rgba(255,255,255,0.05);border:1px solid var(--border-glow);" onclick="cancelSpend()">CANCEL</button>
       </div>
     </div>
   </div>
@@ -1243,6 +1293,57 @@ function spawnParticlesCenter() {
     p.style.animationDelay = (Math.random() * 0.3) + 's';
     container.appendChild(p);
     setTimeout(() => p.remove(), 2000);
+  }
+}
+
+// ─── SPEND EXP ───────────────────────────────────────────
+let pendingSpend = null;
+
+function spendEXP(type, qty) {
+  const cur = getCurrentLevel();
+  const costs = { gaming: cur.gaming, yt: cur.yt, movie: cur.movie, manga: cur.manga };
+  const labels = { gaming: `Gaming ${qty}hr`, yt: `${qty} episode${qty>1?'s':''}`, movie: 'Movie', manga: 'Manga session' };
+  const cost = costs[type] * qty;
+
+  if (state.totalExp < cost) {
+    showXPPopup('NOT ENOUGH EXP', null, true, true);
+    return;
+  }
+
+  const newTotal = state.totalExp - cost;
+  const newLevel = LEVELS.slice().reverse().find(l => newTotal >= l.minExp);
+  const willDrop = newLevel && newLevel.level < cur.level;
+
+  pendingSpend = { cost, type, qty };
+  document.getElementById('spendAmount').textContent = '-' + cost + ' EXP';
+  document.getElementById('spendDesc').textContent = labels[type];
+  document.getElementById('spendWarning').textContent = willDrop
+    ? `⚠ WARNING: You will drop to Level ${newLevel.level}!`
+    : `Remaining: ${newTotal} EXP`;
+  document.getElementById('spendOverlay').classList.add('active');
+}
+
+function confirmSpend() {
+  if (!pendingSpend) return;
+  const cur = getCurrentLevel();
+  state.totalExp = Math.max(0, state.totalExp - pendingSpend.cost);
+  saveState();
+  document.getElementById('spendOverlay').classList.remove('active');
+  showXPPopup('-' + pendingSpend.cost + ' EXP SPENT', null, true, true);
+  checkLevelDown(cur.level);
+  updateUI();
+  pendingSpend = null;
+}
+
+function cancelSpend() {
+  pendingSpend = null;
+  document.getElementById('spendOverlay').classList.remove('active');
+}
+
+function checkLevelDown(prevLvl) {
+  const newLvl = getCurrentLevel().level;
+  if (newLvl < prevLvl) {
+    showXPPopup('LEVEL DOWN ▼', null, true, true);
   }
 }
 
