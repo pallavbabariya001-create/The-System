@@ -65,6 +65,7 @@ pointer-events: none; z-index: 0;
 @keyframes floatUp { 0%{transform:translateY(0) scale(0.8);opacity:1} 100%{transform:translateY(-80px) scale(1.1);opacity:0} }
 @keyframes particleFly { 0%{transform:translate(0,0) scale(1);opacity:1} 100%{transform:translate(var(–tx),var(–ty)) scale(0);opacity:0} }
 @keyframes tickPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+@keyframes statLevelPop { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.2)} 100%{transform:scale(1);opacity:1} }
 
 .container { max-width: 900px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
 
@@ -147,6 +148,19 @@ animation: scanline 3s linear infinite;
 .stat-xp span { font-size: 11px; color: #5a7a9a; font-family: ‘Share Tech Mono’, monospace; font-weight: 400; }
 .stat-name { font-size: 12px; color: #5a7a9a; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
 .stat-source { font-family: ‘Share Tech Mono’, monospace; font-size: 10px; color: #5a7a9a; margin-bottom: 10px; opacity: 0.6; }
+
+/* STAT SUB-LEVEL BADGE */
+.stat-sublevel-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.stat-sublevel-badge {
+font-family: ‘Orbitron’, sans-serif; font-size: 11px; font-weight: 700;
+padding: 2px 8px; border-radius: 2px; letter-spacing: 1px;
+}
+.str .stat-sublevel-badge { background: rgba(255,76,76,0.12); color: #ff4c4c; border: 1px solid rgba(255,76,76,0.25); }
+.wis .stat-sublevel-badge { background: rgba(167,139,250,0.12); color: #a78bfa; border: 1px solid rgba(167,139,250,0.25); }
+.int .stat-sublevel-badge { background: rgba(56,189,248,0.12); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25); }
+.cre .stat-sublevel-badge { background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.25); }
+.stat-sublevel-progress-label { font-family: ‘Share Tech Mono’, monospace; font-size: 10px; color: #5a7a9a; }
+
 .stat-bar-track { height: 6px; background: #0d1f3c; border-radius: 3px; position: relative; overflow: visible; margin-bottom: 12px; }
 .stat-bar-fill { height: 100%; border-radius: 3px; transition: width 0.8s cubic-bezier(0.23,1,0.32,1); }
 .str .stat-bar-fill { background-color: #ff4c4c !important; background: #ff4c4c !important; height: 6px; display: block; position: absolute; top: 0; left: 0; border-radius: 3px; }
@@ -237,6 +251,11 @@ animation: scanline 3s linear infinite;
 .btn-close { background: #3a7bd5; border: none; padding: 12px 40px; border-radius: 3px; color: white; font-family: ‘Orbitron’, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; text-transform: uppercase; }
 .btn-close:hover { background: #5b9ef7; box-shadow: 0 0 20px rgba(91,158,247,0.4); }
 
+/* STAT LEVEL UP OVERLAY */
+.stat-levelup-modal { border-color: var(–modal-color, #00d4ff); box-shadow: 0 0 60px rgba(var(–modal-rgb, 0,212,255),0.3); }
+.stat-modal-title { font-family: ‘Orbitron’, sans-serif; font-size: 36px; font-weight: 900; margin-bottom: 8px; animation: pulse 1s ease-in-out infinite alternate; }
+.stat-modal-sub { font-family: ‘Orbitron’, sans-serif; font-size: 16px; color: #c8d8f0; margin-bottom: 20px; }
+
 /* POPUPS & PARTICLES */
 .xp-popup { position: fixed; font-family: ‘Orbitron’, sans-serif; font-size: 18px; font-weight: 900; pointer-events: none; z-index: 200; animation: floatUp 1.5s ease-out forwards; }
 .particles { position: fixed; inset: 0; pointer-events: none; z-index: 150; overflow: hidden; }
@@ -319,23 +338,42 @@ animation: scanline 3s linear infinite;
 
   <div class="section-title">◈ Active Pillars — Core Stats</div>
   <div class="stats-grid">
-    <div class="stat-card str">
-      <div class="stat-header">
-        <div><div class="stat-tag">STR</div><div class="stat-name" style="margin-top:6px">Physical Prowess</div><div class="stat-source">SOURCE: Gym</div></div>
-        <div class="stat-xp"><span id="strXP">0</span><span> XP</span></div>
-      </div>
-      <div class="stat-bar-track"><div class="stat-bar-fill" id="strBar" style="width:0%"></div></div>
-      <div class="stat-actions">
-        <button class="btn-xp btn-add" id="addbtn-str" onclick="addStatXP('str',event)">+ Quest Complete</button>
-        <button class="btn-xp btn-drain" onclick="drainStat('str',event)" title="Missed session">⚠</button>
-      </div>
-    </div>
 
 ```
+<!-- STR -->
+<div class="stat-card str">
+  <div class="stat-header">
+    <div>
+      <div class="stat-tag">STR</div>
+      <div class="stat-name" style="margin-top:6px">Physical Prowess</div>
+      <div class="stat-source">SOURCE: Gym</div>
+    </div>
+    <div class="stat-xp"><span id="strXP">0</span><span> XP</span></div>
+  </div>
+  <div class="stat-sublevel-row">
+    <div class="stat-sublevel-badge" id="strSubLevel">LVL 0</div>
+    <div class="stat-sublevel-progress-label" id="strSubProgress">0 / 100 XP</div>
+  </div>
+  <div class="stat-bar-track"><div class="stat-bar-fill" id="strBar" style="width:0%"></div></div>
+  <div class="stat-actions">
+    <button class="btn-xp btn-add" id="addbtn-str" onclick="addStatXP('str',event)">+ Quest Complete</button>
+    <button class="btn-xp btn-drain" onclick="drainStat('str',event)" title="Missed session">⚠</button>
+  </div>
+</div>
+
+<!-- WIS -->
 <div class="stat-card wis">
   <div class="stat-header">
-    <div><div class="stat-tag">WIS</div><div class="stat-name" style="margin-top:6px">Ancient Archive</div><div class="stat-source">SOURCE: Reading / Manga</div></div>
+    <div>
+      <div class="stat-tag">WIS</div>
+      <div class="stat-name" style="margin-top:6px">Ancient Archive</div>
+      <div class="stat-source">SOURCE: Reading / Manga</div>
+    </div>
     <div class="stat-xp"><span id="wisXP">0</span><span> XP</span></div>
+  </div>
+  <div class="stat-sublevel-row">
+    <div class="stat-sublevel-badge" id="wisSubLevel">LVL 0</div>
+    <div class="stat-sublevel-progress-label" id="wisSubProgress">0 / 100 XP</div>
   </div>
   <div class="stat-bar-track"><div class="stat-bar-fill" id="wisBar" style="width:0%"></div></div>
   <div class="stat-actions" style="flex-direction:column;gap:6px;">
@@ -347,10 +385,19 @@ animation: scanline 3s linear infinite;
   </div>
 </div>
 
+<!-- INT -->
 <div class="stat-card int">
   <div class="stat-header">
-    <div><div class="stat-tag">INT</div><div class="stat-name" style="margin-top:6px">Cognitive Depth</div><div class="stat-source">SOURCE: Study / Skill</div></div>
+    <div>
+      <div class="stat-tag">INT</div>
+      <div class="stat-name" style="margin-top:6px">Cognitive Depth</div>
+      <div class="stat-source">SOURCE: Study / Skill</div>
+    </div>
     <div class="stat-xp"><span id="intXP">0</span><span> XP</span></div>
+  </div>
+  <div class="stat-sublevel-row">
+    <div class="stat-sublevel-badge" id="intSubLevel">LVL 0</div>
+    <div class="stat-sublevel-progress-label" id="intSubProgress">0 / 100 XP</div>
   </div>
   <div class="stat-bar-track"><div class="stat-bar-fill" id="intBar" style="width:0%"></div></div>
   <div class="stat-actions">
@@ -359,10 +406,19 @@ animation: scanline 3s linear infinite;
   </div>
 </div>
 
+<!-- CRE -->
 <div class="stat-card cre">
   <div class="stat-header">
-    <div><div class="stat-tag">CRE</div><div class="stat-name" style="margin-top:6px">World-Binder</div><div class="stat-source">SOURCE: World-Building / Hobbies</div></div>
+    <div>
+      <div class="stat-tag">CRE</div>
+      <div class="stat-name" style="margin-top:6px">World-Binder</div>
+      <div class="stat-source">SOURCE: World-Building / Hobbies</div>
+    </div>
     <div class="stat-xp"><span id="creXP">0</span><span> XP</span></div>
+  </div>
+  <div class="stat-sublevel-row">
+    <div class="stat-sublevel-badge" id="creSubLevel">LVL 0</div>
+    <div class="stat-sublevel-progress-label" id="creSubProgress">0 / 100 XP</div>
   </div>
   <div class="stat-bar-track"><div class="stat-bar-fill" id="creBar" style="width:0%"></div></div>
   <div class="stat-actions">
@@ -483,6 +539,18 @@ animation: scanline 3s linear infinite;
   </div>
 </div>
 
+<!-- STAT LEVEL UP OVERLAY -->
+
+<div class="overlay" id="statLevelUpOverlay">
+  <div class="modal-box stat-levelup-modal" id="statLevelUpBox">
+    <div class="modal-label" id="statLevelUpLabel">◈ STAT UPGRADED ◈</div>
+    <div class="stat-modal-title" id="statLevelUpTitle">STR</div>
+    <div class="stat-modal-sub" id="statLevelUpSub">Reached Level 1</div>
+    <div class="modal-perks" style="text-align:center;" id="statLevelUpDesc"></div>
+    <button class="btn-close" id="statLevelUpCloseBtn" onclick="closeStatLevelUp()">ACKNOWLEDGE</button>
+  </div>
+</div>
+
 <!-- SPEND / PASS CONFIRM OVERLAY -->
 
 <div class="overlay" id="spendOverlay">
@@ -511,7 +579,15 @@ const LEVELS = [
   { level:5, minExp:1500, sessionXP:15, mangaXP:3, drain:20, leisure:45, leisureReq:45, gaming:15, yt:20, movie:25, perk:'Half-Day Pass limit → 3×/week' },
 ];
 
-const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+// Sub-level colours and display info per stat
+const STAT_META = {
+  str: { label: 'STR', color: '#ff4c4c', rgb: '255,76,76',   name: 'Physical Prowess' },
+  wis: { label: 'WIS', color: '#a78bfa', rgb: '167,139,250', name: 'Ancient Archive'   },
+  int: { label: 'INT', color: '#38bdf8', rgb: '56,189,248',  name: 'Cognitive Depth'   },
+  cre: { label: 'CRE', color: '#34d399', rgb: '52,211,153',  name: 'World-Binder'      },
+};
+
+const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 function getWeekKey() {
@@ -522,12 +598,13 @@ function getWeekKey() {
 
 function defaultState() {
   return {
-    totalExp:0, dailyExp:0,
-    stats:{str:0,wis:0,int:0,cre:0},
-    questsDone:{str:false,wis:false,int:false,cre:false},
+    totalExp: 0, dailyExp: 0,
+    stats: { str:0, wis:0, int:0, cre:0 },
+    statLevels: { str:0, wis:0, int:0, cre:0 },   // ← NEW: sub-levels per stat
+    questsDone: { str:false, wis:false, int:false, cre:false },
     lastDay: new Date().toDateString(),
     lastWeek: getWeekKey(),
-    passesUsed:{oneDay:0,halfDay:0}
+    passesUsed: { oneDay:0, halfDay:0 }
   };
 }
 
@@ -542,10 +619,19 @@ let state = (function(){
         p.lastDay = new Date().toDateString();
       }
       if (!p.passesUsed) p.passesUsed = {oneDay:0,halfDay:0};
-      if (!p.lastWeek) p.lastWeek = getWeekKey();
+      if (!p.lastWeek)   p.lastWeek   = getWeekKey();
       if (p.lastWeek !== getWeekKey()) {
         p.passesUsed = {oneDay:0,halfDay:0};
         p.lastWeek = getWeekKey();
+      }
+      // Migrate old saves that don't have statLevels yet
+      if (!p.statLevels) {
+        p.statLevels = {
+          str: Math.floor((p.stats.str || 0) / 100),
+          wis: Math.floor((p.stats.wis || 0) / 100),
+          int: Math.floor((p.stats.int || 0) / 100),
+          cre: Math.floor((p.stats.cre || 0) / 100),
+        };
       }
       return p;
     }
@@ -568,6 +654,17 @@ function getNext() {
   return LEVELS[idx+1] || null;
 }
 
+// ─── STAT SUB-LEVEL HELPERS ───────────────────────────────
+// Returns how many complete 100-XP tiers the stat has earned
+function getStatLevel(stat) {
+  return Math.floor(state.stats[stat] / 100);
+}
+
+// XP within the current sub-level tier (0–99)
+function getStatXPInTier(stat) {
+  return state.stats[stat] % 100;
+}
+
 // ─── CLOCK & COUNTDOWN ────────────────────────────────────
 function updateClock() {
   const now = new Date();
@@ -578,7 +675,6 @@ function updateClock() {
   document.getElementById('clockDate').textContent = dateStr;
   document.getElementById('clockTime').textContent = h + ':' + m + ':' + s;
 
-  // Countdown to midnight
   const midnight = new Date(now); midnight.setHours(24,0,0,0);
   const diff = midnight - now;
   const rh = Math.floor(diff/3600000).toString().padStart(2,'0');
@@ -588,22 +684,17 @@ function updateClock() {
   document.getElementById('clockCountdown').innerHTML = cdText;
   document.getElementById('questTimerDisplay').innerHTML = cdText;
 
-  // Auto reset check
   if (state.lastDay !== now.toDateString()) {
     state.questsDone = {str:false,wis:false,int:false,cre:false};
     state.dailyExp = 0;
     state.lastDay = now.toDateString();
-    save();
-    updateUI();
+    save(); updateUI();
   }
-
-  // Weekly pass reset check
   const wk = getWeekKey();
   if (state.lastWeek !== wk) {
     state.passesUsed = {oneDay:0,halfDay:0};
     state.lastWeek = wk;
-    save();
-    updateUI();
+    save(); updateUI();
   }
 }
 
@@ -635,16 +726,38 @@ function updateUI() {
   document.getElementById('rew-leisure-req').textContent = cur.leisureReq;
 
   ['str','wis','int','cre'].forEach(s => {
-    document.getElementById(s+'XP').textContent = state.stats[s];
-    document.getElementById(s+'Bar').style.width = Math.min(100,(state.stats[s]/Math.max(state.stats[s],100))*100)+'%';
+    const xp       = state.stats[s];
+    const subLvl   = getStatLevel(s);
+    const tierXP   = getStatXPInTier(s);
+
+    // Total XP display
+    document.getElementById(s+'XP').textContent = xp;
+
+    // Sub-level badge & progress label
+    document.getElementById(s+'SubLevel').textContent = 'LVL ' + subLvl;
+    document.getElementById(s+'SubProgress').textContent = tierXP + ' / 100 XP';
+
+    // Progress bar: fills 0–100% within the current sub-level tier
+    document.getElementById(s+'Bar').style.width = tierXP + '%';
+
+    // Quest state
     const done = state.questsDone[s];
     document.getElementById('quest-'+s).className = 'quest-item' + (done ? ' completed' : '');
     document.getElementById('check-'+s).textContent = done ? '✓' : '';
     const addBtn = document.getElementById('addbtn-'+s);
-    if (addBtn) { addBtn.disabled = !done; addBtn.style.opacity = done ? '1' : '0.3'; addBtn.title = done ? '' : 'Complete the daily quest first!'; }
+    if (addBtn) {
+      addBtn.disabled = !done;
+      addBtn.style.opacity = done ? '1' : '0.3';
+      addBtn.title = done ? '' : 'Complete the daily quest first!';
+    }
   });
+
   const mangaBtn = document.getElementById('addbtn-manga');
-  if (mangaBtn) { mangaBtn.disabled = !state.questsDone.wis; mangaBtn.style.opacity = state.questsDone.wis ? '1' : '0.3'; mangaBtn.title = state.questsDone.wis ? '' : 'Complete The Great Library quest first!'; }
+  if (mangaBtn) {
+    mangaBtn.disabled = !state.questsDone.wis;
+    mangaBtn.style.opacity = state.questsDone.wis ? '1' : '0.3';
+    mangaBtn.title = state.questsDone.wis ? '' : 'Complete The Great Library quest first!';
+  }
 
   // Passes
   const oneLocked = cur.level < 3;
@@ -670,36 +783,56 @@ function updateUI() {
 
 // ─── STAT ACTIONS ─────────────────────────────────────────
 function addStatXP(stat, ev) {
-  const prev = getLevel().level;
+  const prevMainLevel = getLevel().level;
+  const prevStatLevel = getStatLevel(stat);
   const cur = getLevel();
-  state.stats[stat] += cur.sessionXP;
-  state.totalExp += cur.sessionXP;
-  state.dailyExp += cur.sessionXP;
+
+  state.stats[stat]  += cur.sessionXP;
+  state.totalExp     += cur.sessionXP;
+  state.dailyExp     += cur.sessionXP;
   save();
+
   showPopup('+' + cur.sessionXP + ' ' + stat.toUpperCase(), ev, false);
   spawnParticles(ev);
-  if (getLevel().level > prev) setTimeout(() => showLevelUp(getLevel().level), 400);
+
+  // Check stat sub-level up
+  const newStatLevel = getStatLevel(stat);
+  if (newStatLevel > prevStatLevel) {
+    setTimeout(() => showStatLevelUp(stat, newStatLevel), 300);
+  }
+
+  // Check main level up
+  if (getLevel().level > prevMainLevel) setTimeout(() => showLevelUp(getLevel().level), 700);
   updateUI();
 }
 
 function addMangaXP(ev) {
-  const prev = getLevel().level;
+  const prevMainLevel = getLevel().level;
+  const prevStatLevel = getStatLevel('wis');
   const cur = getLevel();
+
   state.stats.wis += cur.mangaXP;
-  state.totalExp += cur.mangaXP;
-  state.dailyExp += cur.mangaXP;
+  state.totalExp  += cur.mangaXP;
+  state.dailyExp  += cur.mangaXP;
   save();
+
   showPopup('+' + cur.mangaXP + ' WIS (Manga)', ev, false);
   spawnParticles(ev);
-  if (getLevel().level > prev) setTimeout(() => showLevelUp(getLevel().level), 400);
+
+  const newStatLevel = getStatLevel('wis');
+  if (newStatLevel > prevStatLevel) {
+    setTimeout(() => showStatLevelUp('wis', newStatLevel), 300);
+  }
+
+  if (getLevel().level > prevMainLevel) setTimeout(() => showLevelUp(getLevel().level), 700);
   updateUI();
 }
 
 function drainStat(stat, ev) {
   const cur = getLevel();
-  state.stats[stat] = Math.max(0, state.stats[stat] - cur.drain);
-  state.totalExp = Math.max(cur.minExp, state.totalExp - cur.drain);
-  state.dailyExp = Math.max(0, state.dailyExp - cur.drain);
+  state.stats[stat]  = Math.max(0, state.stats[stat] - cur.drain);
+  state.totalExp     = Math.max(cur.minExp, state.totalExp - cur.drain);
+  state.dailyExp     = Math.max(0, state.dailyExp - cur.drain);
   save();
   showPopup('-' + cur.drain + ' ' + stat.toUpperCase() + ' ⚠', ev, true);
   updateUI();
@@ -707,22 +840,30 @@ function drainStat(stat, ev) {
 
 function toggleQuest(stat) {
   if (state.questsDone[stat]) return;
-  const prev = getLevel().level;
+  const prevMainLevel = getLevel().level;
+  const prevStatLevel = getStatLevel(stat);
+
   state.questsDone[stat] = true;
-  state.stats[stat] += 5;
-  state.totalExp += 5;
-  state.dailyExp += 5;
+  state.stats[stat]  += 5;
+  state.totalExp     += 5;
+  state.dailyExp     += 5;
   save();
+
   showPopup('+5 ' + stat.toUpperCase() + ' XP', null, false);
-  if (getLevel().level > prev) setTimeout(() => showLevelUp(getLevel().level), 400);
+
+  const newStatLevel = getStatLevel(stat);
+  if (newStatLevel > prevStatLevel) {
+    setTimeout(() => showStatLevelUp(stat, newStatLevel), 300);
+  }
+
+  if (getLevel().level > prevMainLevel) setTimeout(() => showLevelUp(getLevel().level), 700);
   updateUI();
 }
 
 function manualQuestReset() {
   if (confirm('Manually reset daily quests? This does not affect your EXP.')) {
     state.questsDone = {str:false,wis:false,int:false,cre:false};
-    save();
-    updateUI();
+    save(); updateUI();
   }
 }
 
@@ -730,14 +871,14 @@ function manualQuestReset() {
 let pendingSpend = null;
 
 function usePass(type) {
-  const cost = type === 'oneDay' ? 150 : 80;
+  const cost  = type === 'oneDay' ? 150 : 80;
   const label = type === 'oneDay' ? '☀ One Day Freedom Pass' : '⚡ Half-Day Freedom Pass';
   const newTotal = state.totalExp - cost;
   const newLevel = LEVELS.slice().reverse().find(l => newTotal >= l.minExp);
   const cur = getLevel();
-  pendingSpend = { cost, label, isPass: true, passType: type };
-  document.getElementById('spendAmount').textContent = '-' + cost + ' EXP';
-  document.getElementById('spendDesc').textContent = label;
+  pendingSpend = { cost, label, isPass:true, passType:type };
+  document.getElementById('spendAmount').textContent  = '-' + cost + ' EXP';
+  document.getElementById('spendDesc').textContent    = label;
   document.getElementById('spendWarning').textContent = (newLevel && newLevel.level < cur.level)
     ? '⚠ WARNING: You will drop to Level ' + newLevel.level + '!'
     : 'Remaining after spend: ' + newTotal + ' EXP';
@@ -747,20 +888,17 @@ function usePass(type) {
 // ─── SPEND EXP ────────────────────────────────────────────
 function spendEXP(type, qty) {
   const cur = getLevel();
-  const costs = { gaming: cur.gaming, yt: cur.yt, movie: cur.movie };
-  const labels = { gaming: 'Gaming ' + qty + 'hr', yt: qty + ' Episode' + (qty > 1 ? 's' : ''), movie: 'Movie' };
-  const cost = costs[type] * qty;
+  const costs  = { gaming:cur.gaming, yt:cur.yt, movie:cur.movie };
+  const labels = { gaming:'Gaming ' + qty + 'hr', yt:qty + ' Episode' + (qty>1?'s':''), movie:'Movie' };
+  const cost   = costs[type] * qty;
 
-  if (state.totalExp < cost) {
-    showPopup('NOT ENOUGH EXP', null, true);
-    return;
-  }
+  if (state.totalExp < cost) { showPopup('NOT ENOUGH EXP', null, true); return; }
 
   const newTotal = state.totalExp - cost;
   const newLevel = LEVELS.slice().reverse().find(l => newTotal >= l.minExp);
-  pendingSpend = { cost, label: labels[type], isPass: false };
-  document.getElementById('spendAmount').textContent = '-' + cost + ' EXP';
-  document.getElementById('spendDesc').textContent = labels[type];
+  pendingSpend = { cost, label:labels[type], isPass:false };
+  document.getElementById('spendAmount').textContent  = '-' + cost + ' EXP';
+  document.getElementById('spendDesc').textContent    = labels[type];
   document.getElementById('spendWarning').textContent = (newLevel && newLevel.level < cur.level)
     ? '⚠ WARNING: You will drop to Level ' + newLevel.level + '!'
     : 'Remaining after spend: ' + newTotal + ' EXP';
@@ -787,9 +925,9 @@ function cancelSpend() {
   document.getElementById('spendOverlay').classList.remove('active');
 }
 
-// ─── LEVEL UP ─────────────────────────────────────────────
+// ─── MAIN LEVEL UP ────────────────────────────────────────
 function showLevelUp(lvl) {
-  const cur = LEVELS.find(l => l.level === lvl) || LEVELS[LEVELS.length - 1];
+  const cur = LEVELS.find(l => l.level === lvl) || LEVELS[LEVELS.length-1];
   document.getElementById('newLevelNum').textContent = lvl;
   document.getElementById('levelupPerks').innerHTML = `
     <div style="margin-bottom:8px;color:#5a7a9a;font-size:12px;font-family:'Share Tech Mono',monospace;">NEW LEVEL STATS</div>
@@ -808,26 +946,51 @@ function closeLevelUp() {
   document.getElementById('levelUpOverlay').classList.remove('active');
 }
 
+// ─── STAT LEVEL UP ────────────────────────────────────────
+function showStatLevelUp(stat, newLevel) {
+  const meta = STAT_META[stat];
+  const box  = document.getElementById('statLevelUpBox');
+
+  // Theme the modal to the stat's colour
+  box.style.borderColor = meta.color;
+  box.style.boxShadow   = '0 0 60px rgba(' + meta.rgb + ',0.3)';
+
+  document.getElementById('statLevelUpLabel').style.color = meta.color;
+  document.getElementById('statLevelUpTitle').textContent  = meta.label + ' LEVEL UP!';
+  document.getElementById('statLevelUpTitle').style.color  = meta.color;
+  document.getElementById('statLevelUpSub').textContent    = meta.name + ' reached Level ' + newLevel;
+  document.getElementById('statLevelUpDesc').innerHTML     =
+    '<div style="color:#5a7a9a;font-size:12px;font-family:\'Share Tech Mono\',monospace;margin-bottom:6px;">MILESTONE REACHED</div>' +
+    '<div style="font-size:15px;">Every 100 XP in <span style="color:' + meta.color + ';font-weight:700;">' + meta.label + '</span> earns a sub-level.<br>' +
+    'You are now <span style="color:' + meta.color + ';font-weight:700;">' + meta.label + ' Level ' + newLevel + '</span>. Keep grinding!</div>';
+
+  document.getElementById('statLevelUpCloseBtn').style.background = meta.color;
+  document.getElementById('statLevelUpCloseBtn').style.color = (stat === 'wis' || stat === 'int') ? '#000' : '#fff';
+
+  document.getElementById('statLevelUpOverlay').classList.add('active');
+  spawnParticlesCenter();
+}
+
+function closeStatLevelUp() {
+  document.getElementById('statLevelUpOverlay').classList.remove('active');
+}
+
 // ─── RESET ────────────────────────────────────────────────
 function confirmReset() {
   if (confirm('Reset ALL progress? This cannot be undone.')) {
     state = defaultState();
-    save();
-    updateUI();
+    save(); updateUI();
   }
 }
 
 // ─── EFFECTS ──────────────────────────────────────────────
-function showPopup(text, ev, isDrain = false) {
+function showPopup(text, ev, isDrain=false) {
   const el = document.createElement('div');
   el.className = 'xp-popup';
   el.textContent = text;
   el.style.color = isDrain ? '#ff3333' : '#00d4ff';
-  if (!ev) {
-    el.style.left = '50%'; el.style.top = '40%'; el.style.transform = 'translateX(-50%)';
-  } else {
-    el.style.left = (ev.clientX - 30) + 'px'; el.style.top = (ev.clientY - 20) + 'px';
-  }
+  if (!ev) { el.style.left='50%'; el.style.top='40%'; el.style.transform='translateX(-50%)'; }
+  else      { el.style.left=(ev.clientX-30)+'px'; el.style.top=(ev.clientY-20)+'px'; }
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 1500);
 }
@@ -835,36 +998,34 @@ function showPopup(text, ev, isDrain = false) {
 function spawnParticles(ev) {
   if (!ev) return;
   const c = document.getElementById('particlesContainer');
-  for (let i = 0; i < 10; i++) {
+  for (let i=0;i<10;i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    const angle = Math.random() * Math.PI * 2;
-    const dist = 50 + Math.random() * 80;
-    p.style.left = ev.clientX + 'px'; p.style.top = ev.clientY + 'px';
-    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
-    p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
+    const angle = Math.random()*Math.PI*2, dist = 50+Math.random()*80;
+    p.style.left = ev.clientX+'px'; p.style.top = ev.clientY+'px';
+    p.style.setProperty('--tx',(Math.cos(angle)*dist)+'px');
+    p.style.setProperty('--ty',(Math.sin(angle)*dist)+'px');
     p.style.background = ['#00d4ff','#5b9ef7','#f0c040'][Math.floor(Math.random()*3)];
-    p.style.animationDelay = (Math.random() * 0.2) + 's';
+    p.style.animationDelay = (Math.random()*0.2)+'s';
     c.appendChild(p);
-    setTimeout(() => p.remove(), 1800);
+    setTimeout(()=>p.remove(),1800);
   }
 }
 
 function spawnParticlesCenter() {
   const c = document.getElementById('particlesContainer');
-  for (let i = 0; i < 30; i++) {
+  for (let i=0;i<30;i++) {
     const p = document.createElement('div');
     p.className = 'particle';
-    p.style.width = p.style.height = (4 + Math.random() * 6) + 'px';
-    const angle = Math.random() * Math.PI * 2;
-    const dist = 100 + Math.random() * 200;
-    p.style.left = '50vw'; p.style.top = '50vh';
-    p.style.setProperty('--tx', (Math.cos(angle) * dist) + 'px');
-    p.style.setProperty('--ty', (Math.sin(angle) * dist) + 'px');
+    p.style.width = p.style.height = (4+Math.random()*6)+'px';
+    const angle = Math.random()*Math.PI*2, dist = 100+Math.random()*200;
+    p.style.left='50vw'; p.style.top='50vh';
+    p.style.setProperty('--tx',(Math.cos(angle)*dist)+'px');
+    p.style.setProperty('--ty',(Math.sin(angle)*dist)+'px');
     p.style.background = ['#00d4ff','#f0c040','#5b9ef7','#34d399'][Math.floor(Math.random()*4)];
-    p.style.animationDelay = (Math.random() * 0.3) + 's';
+    p.style.animationDelay=(Math.random()*0.3)+'s';
     c.appendChild(p);
-    setTimeout(() => p.remove(), 2000);
+    setTimeout(()=>p.remove(),2000);
   }
 }
 
